@@ -8,14 +8,14 @@ shinyUI(fluidPage(
                      
                      numericInput("SampleSize1", label = "Number of Games 1",
                                   min = 0, max = 50000, step = 100, value = 1000),
-                     sliderInput("c1ROI", label = "Customer 1 ROI",
+                     sliderInput("c1ROI", label = "Alice ROI",
                                  min = -25, max = 25, value = 3),
                      sliderInput("GameProb1", label = "Line Prob 1",
                                  min = 0, max = 100, value = 10),
                      
                      numericInput("SampleSize2", label = "Number of Games 2",
                                   min = 0, max = 50000, step = 100, value = 1000),
-                     sliderInput("c2ROI", label = "Customer 2 ROI",
+                     sliderInput("c2ROI", label = "Bob ROI",
                                  min = -25, max = 25, value = 3),
                      sliderInput("GameProb2", label = "Line Prob 2",
                                  min = 0, max = 100, value = 50),
@@ -23,7 +23,7 @@ shinyUI(fluidPage(
                      
                      numericInput("SampleSize3", label = "Number of Games 3",
                                   min = 0, max = 50000, step = 100, value = 1000),
-                     sliderInput("c3ROI", label = "Customer 3 ROI",
+                     sliderInput("c3ROI", label = "Charlie ROI",
                                  min = -25, max = 25, value = 3),
                      sliderInput("GameProb3", label = "Line Prob 3",
                                  min = 0, max = 100, value = 90),
