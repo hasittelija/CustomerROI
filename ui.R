@@ -74,7 +74,7 @@ shinyUI(fluidPage(
             
             plotOutput("plot"),
             h4("Quantiles and mean:"),
-            tableOutput("text1")
+            tableOutput("table1")
             
             
             

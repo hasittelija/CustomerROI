@@ -15,9 +15,9 @@ shinyServer(function(input, output) {
         samplesize <- input$SampleSize1
         ROI <- input$c1ROI/100
         lineprob <- input$GameProb1/100
-
+        
         decimal_odds <- (1+ROI)/lineprob
-    
+        
         #simulate game results
         flips <- rbinom(number_of_simulations, samplesize, lineprob)
         
@@ -44,7 +44,7 @@ shinyServer(function(input, output) {
         
         #simulate game results
         flips <- rbinom(number_of_simulations, samplesize, lineprob)
-        })
+    })
     
     
     simulatedlineprob <- reactive({
@@ -55,7 +55,7 @@ shinyServer(function(input, output) {
         lineprobmatrix <- cbind(simulatedlineprob1, simulatedlineprob2, simulatedlineprob3)
         colnames(lineprobmatrix) <- c("Alice", "Bob", "Charlie")
         return(lineprobmatrix)
-        })
+    })
     
     
     simulatedwinloss <- reactive({
@@ -93,22 +93,58 @@ shinyServer(function(input, output) {
     
     
     
-    output$text1 <- renderTable({
-      #  cust1flips()[1]
-        simulatedlineprob <- simulatedlineprob()
+    output$table1 <- renderTable({
+        #  cust1flips()[1]
         
-CI_and_mean <-        cbind("2.5%" = c(apply(simulatedlineprob, 2, function (x) quantile(x, 0.025))), "mean" = apply(simulatedlineprob, 2, mean), "97.5%" = c(apply(simulatedlineprob, 2, function (x) quantile(x, 0.975))))
-        names(CI_and_mean) <- c("2.5%", "mean", "97.5%")
-        return(CI_and_mean)
-
-
-})
-    
+        plot_type <- plotType() # 1 for game prob, 2 for ROI, 3 for winloss
         
+        
+        if(plot_type == 1) {
+            
+            simulatedlineprob <- simulatedlineprob()
+            
+            
+            CI_and_mean <-        cbind("2.5%" = c(apply(simulatedlineprob, 2, function (x) quantile(x, 0.025))), "mean" = apply(simulatedlineprob, 2, mean), "97.5%" = c(apply(simulatedlineprob, 2, function (x) quantile(x, 0.975))))
+            names(CI_and_mean) <- c("2.5%", "mean", "97.5%")
+            return(CI_and_mean)
+        }
+        
+        if(plot_type == 2) {
+            
+            simulatedholdrisk <- simulatedROI()
+            
+            CI_and_mean <-  cbind("2.5%" = c(apply(simulatedholdrisk, 2, function (x) quantile(x, 0.025))), "mean" = apply(simulatedholdrisk, 2, mean), "97.5%" = c(apply(simulatedholdrisk, 2, function (x) quantile(x, 0.975))))
+            names(CI_and_mean) <- c("2.5%", "mean", "97.5%")
+            return(CI_and_mean)
+            
+            
+            
+        }
+        
+        if(plot_type == 3) {
+            
+            simulatedwinloss <- simulatedwinloss()
+            
+            
+            CI_and_mean <- cbind("2.5%" = c(apply(simulatedwinloss, 2, function (x) quantile(x, 0.025))), "mean" = apply(simulatedwinloss, 2, mean), "97.5%" = c(apply(simulatedwinloss, 2, function (x) quantile(x, 0.975))))
 
-
+            names(CI_and_mean) <- c("2.5%", "mean", "97.5%")
+            return(CI_and_mean)
+            
+            
+        }
+        
+        
+        
+        
+        
+    })
     
-
+    
+    
+    
+    
+    
     
     output$plot <- renderPlot({
         
@@ -118,12 +154,12 @@ CI_and_mean <-        cbind("2.5%" = c(apply(simulatedlineprob, 2, function (x) 
             simulatedlineprob <- simulatedlineprob()
             
             melted_simulatedlineprob <- melt(simulatedlineprob)
-        colnames(melted_simulatedlineprob)[2] <- "Customer"
-        return(ggplot(melted_simulatedlineprob, aes(value, fill = Customer)) + geom_density(alpha = 0.2) +
-            ggtitle("Histogram of maximum likehood estimates for win probabilities") + xlab("Win probability") +
-            scale_x_continuous(label = percent))
+            colnames(melted_simulatedlineprob)[2] <- "Customer"
+            return(ggplot(melted_simulatedlineprob, aes(value, fill = Customer)) + geom_density(alpha = 0.2) +
+                       ggtitle("Histogram of maximum likehood estimates for win probabilities") + xlab("Win probability") +
+                       scale_x_continuous(label = percent))
         }
-    
+        
         if(plot_type == 2){
             simulatedholdrisk <- simulatedROI()
             
@@ -131,8 +167,8 @@ CI_and_mean <-        cbind("2.5%" = c(apply(simulatedlineprob, 2, function (x) 
             melted_simulatedholdrisk <- melt(simulatedholdrisk)
             colnames(melted_simulatedholdrisk)[2] <- "Customer"
             return(ggplot(melted_simulatedholdrisk, aes(value, fill = Customer)) + geom_density(alpha = 0.2) +
-                ggtitle("Histogram of calculated hold risks") + xlab("Customer hold risk percentage") +
-                scale_x_continuous(label = percent))
+                       ggtitle("Histogram of calculated hold risks") + xlab("Customer hold risk percentage") +
+                       scale_x_continuous(label = percent))
         }
         
         
@@ -142,6 +178,7 @@ CI_and_mean <-        cbind("2.5%" = c(apply(simulatedlineprob, 2, function (x) 
         
         if(plot_type == 3) {
             simulatedwinloss <- simulatedwinloss()
+
             melted_simulatedwinloss <- melt(simulatedwinloss)
             colnames(melted_simulatedwinloss)[2] <- "Customer"
             ggplot(melted_simulatedwinloss, aes(value, fill = Customer)) + geom_density(alpha = 0.2) +
