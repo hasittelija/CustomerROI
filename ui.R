@@ -1,37 +1,61 @@
 
 shinyUI(fluidPage(
-    titlePanel("My Shiny App"),
+    titlePanel("Sports bettor simulator"),
     sidebarLayout(
-        sidebarPanel(h3("Installation"),
-                     "Shiny is available on CRAN, so you can install it in the usual way from your R console:",
+        sidebarPanel(h3("Input"),
+                     "Simulation of 3 different sports bettors: Alice, Bob and Carol. Each bettor has their own parameters and these are independent from the other bettors. You can set the number of bets they do, the probability of the games they bet and return on investment (ROI).",
+                     
+                     br(),
+                     br(),
+                     p("For example if we choose 300 bets, 50% bet win probability and 10% ROI. It means the bettor bets 300 bets where each bet has 50% probability of winning, and on average for each unit wagered, bettor expects to make 10% profit. Since the ROI is positive, this customer is winning sports bettor and manages to find bets where the odds offered are too good."),
+                     
+                     #br(),
+                     br(),
+                     p("You can choose from 3 different graphs: game probability, customer ROI% or customer win loss (assuming each bet is for $1). The graphs will show the probability density function of the chosen statistic after all the bets are done. By changing the parameters you can test how these parameters change the probability density function."), 
                      
                      
-                     numericInput("SampleSize1", label = "Number of Games 1",
-                                  min = 0, max = 50000, step = 100, value = 1000),
-                     sliderInput("c1ROI", label = "Alice ROI",
-                                 min = -25, max = 25, value = 3),
-                     sliderInput("GameProb1", label = "Line Prob 1",
-                                 min = 0, max = 100, value = 10),
+                     fluidRow(
+                         
+                         column(3, numericInput("SampleSize1", label = "Number of bets Alice",
+                                                min = 0, max = 50000, step = 100, value = 1000)),
+                         column(3, sliderInput("c1ROI", label = "Alice ROI %",
+                                               min = -25, max = 25, value = 3)),
+                         column(3, sliderInput("GameProb1", label = "Bet win probability % Alice",
+                                               min = 0, max = 100, value = 10))
+                         
+                         
+                         
+                     ),
                      
-                     numericInput("SampleSize2", label = "Number of Games 2",
-                                  min = 0, max = 50000, step = 100, value = 1000),
-                     sliderInput("c2ROI", label = "Bob ROI",
-                                 min = -25, max = 25, value = 3),
-                     sliderInput("GameProb2", label = "Line Prob 2",
-                                 min = 0, max = 100, value = 50),
+                     fluidRow(
+                         
+                         
+                         column(3, numericInput("SampleSize2", label = "Number of bets Bob",
+                                                min = 0, max = 50000, step = 100, value = 1000)),
+                         column(3, sliderInput("c2ROI", label = "Bob ROI %",
+                                               min = -25, max = 25, value = 3)),
+                         column(3, sliderInput("GameProb2", label = "Bet win probability % Bob",
+                                               min = 0, max = 100, value = 50))
+                         
+                     ),
                      
                      
-                     numericInput("SampleSize3", label = "Number of Games 3",
-                                  min = 0, max = 50000, step = 100, value = 1000),
-                     sliderInput("c3ROI", label = "Charlie ROI",
-                                 min = -25, max = 25, value = 3),
-                     sliderInput("GameProb3", label = "Line Prob 3",
-                                 min = 0, max = 100, value = 90),
+                     fluidRow(
+                         
+                         column(3, numericInput("SampleSize3", label = "Number of bets Carol",
+                                                min = 0, max = 50000, step = 100, value = 1000)),
+                         column(3, sliderInput("c3ROI", label = "Carol ROI %",
+                                               min = -25, max = 25, value = 3)),
+                         column(3, sliderInput("GameProb3", label = "Bet win probability % Carol",
+                                               min = 0, max = 100, value = 90))
+                         
+                         
+                     ),
                      
-                     radioButtons("PlotType", label = h3("Confidence Interval Type"),
-                                  choices = list("Game Probability" = 1, "Customer ROI" = 2,
+                     radioButtons("PlotType", label = h3("Graph Type"),
+                                  choices = list("Bet Probability %" = 1, "Customer ROI %" = 2,
                                                  "Customer WinLoss" = 3),selected = 2)
-        
+                     
                      
                      
                      
@@ -47,16 +71,12 @@ shinyUI(fluidPage(
               "easy to build interactive web applications with R."),
             p("For an introduction and live examples, visit the ", 
               span("Shiny homepage.", style = "color:blue")),
-
+            
             plotOutput("plot"),
-            textOutput("text1"),
+            h4("Quantiles and mean:"),
+            tableOutput("text1")
             
             
-            p(h2("Features")),
-            p("* Build useful web applications with only a few lines of code - no JavaScript required."),
-            p("* Shiny applications are automatically \"live\" in the same way that ",
-              strong("spreadsheets"), "are live. Outputs change instantly as users modify
-              inputs, without requireing a reload of the browser.")
             
             
         )

@@ -3,7 +3,7 @@ require(ggplot2)
 require(reshape)
 require(scales)
 require(shiny)
-number_of_simulations <- 5000
+number_of_simulations <- 10000
 
 
 
@@ -93,7 +93,7 @@ shinyServer(function(input, output) {
     
     
     
-    output$text1 <- renderText({
+    output$text1 <- renderTable({
       #  cust1flips()[1]
         simulatedlineprob <- simulatedlineprob()
         
