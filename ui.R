@@ -2,16 +2,7 @@
 shinyUI(fluidPage(
     titlePanel("Sports bettor simulator"),
     sidebarLayout(
-        sidebarPanel(h3("Input"),
-                     "Simulation of 3 different sports bettors: Alice, Bob and Carol. Each bettor has their own parameters and these are independent from the other bettors. You can set the number of bets they do, the probability of the games they bet and return on investment (ROI).",
-                     
-                     br(),
-                     br(),
-                     p("For example if we choose 300 bets, 50% bet win probability and 10% ROI. It means the bettor bets 300 bets where each bet has 50% probability of winning, and on average for each unit wagered, bettor expects to make 10% profit. Since the ROI is positive, this customer is winning sports bettor and manages to find bets where the odds offered are too good."),
-                     
-                     #br(),
-                     br(),
-                     p("You can choose from 3 different graphs: game probability, customer ROI% or customer win loss (assuming each bet is for $1). The graphs will show the probability density function of the chosen statistic after all the bets are done. By changing the parameters you can test how these parameters change the probability density function."), 
+        sidebarPanel(
                      
                      
                      fluidRow(
@@ -54,9 +45,22 @@ shinyUI(fluidPage(
                      
                      radioButtons("PlotType", label = h3("Graph Type"),
                                   choices = list("Bet Probability %" = 1, "Customer ROI %" = 2,
-                                                 "Customer WinLoss" = 3),selected = 2)
+                                                 "Customer Hold %" = 4, "Customer WinLoss" = 3)
+                                  ,selected = 2)
+                     
+                     ,
                      
                      
+                     h3("Input"),
+                     "Simulation of 3 different sports bettors: Alice, Bob and Carol. Each bettor has their own parameters and these are independent from the other bettors. You can set the number of bets they do, the probability of the games they bet and return on investment (ROI).",
+                     
+                     br(),
+                     br(),
+                     p("For example if we choose 300 bets, 50% bet win probability and 10% ROI. It means the bettor bets 300 bets where each bet has 50% probability of winning, and on average for each unit wagered, bettor expects to make 10% profit. Since the ROI is positive, this customer is winning sports bettor and manages to find bets where the odds offered are too good."),
+                     
+                     #br(),
+                     br(),
+                     p("You can choose from 3 different graphs: game probability, customer ROI% or customer win loss (assuming each bet is for $1). The graphs will show the probability density function of the chosen statistic after all the bets are done. By changing the parameters you can test how these parameters change the probability density function.")
                      
                      
                      
@@ -66,11 +70,8 @@ shinyUI(fluidPage(
                      
         ),
         mainPanel(
-            h2("Introducing Shiny"),
-            p("Shiny is a new package from RStudio that makes it", em("incredibly"),
-              "easy to build interactive web applications with R."),
-            p("For an introduction and live examples, visit the ", 
-              span("Shiny homepage.", style = "color:blue")),
+            h2("H2 title"),
+            p("paragraph"),
             
             plotOutput("plot"),
             h4("Quantiles and mean:"),

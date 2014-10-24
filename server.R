@@ -57,6 +57,17 @@ shinyServer(function(input, output) {
         return(lineprobmatrix)
     })
     
+
+    get_bet_probs <- reactive({
+        g1prob <- input$GameProb1
+        g2prob <- input$GameProb2
+        g3prob <- input$GameProb3
+        
+        probs <- c(g1prob, g2prob, g3prob)
+        return(probs)
+        
+    })
+    
     
     simulatedwinloss <- reactive({
         decimal_odds1 <- (1+input$c1ROI/100)/(input$GameProb1/100)
@@ -186,6 +197,43 @@ shinyServer(function(input, output) {
                 scale_x_continuous(label = dollar)  
             
         }
+        
+        if(plot_type == 4) {
+            simulatedholdrisk <- simulatedROI()
+            betprobs <- get_bet_probs()/100
+            # calculate how much bettor can max bet in pinny format
+            # where you can max bet more if line prob is over 50%
+            volume_vec <- rep(NA,length(betprobs))
+            for(i in 1:length(betprobs)) {
+                prob <- betprobs[i]
+                if(prob <= 0.5) {
+                    volume_vec[i] <- 1
+                }
+                if(prob > 0.5) {
+                    volume_vec[i] <- 1/(1-prob)
+                }
+                
+            }
+
+            # multiply simulatedholdrisk vector with volume vector, so that cust1 holdrisks get multiplied
+            # by his volume vector, cust2 by her and so on
+            simulatedhold <- t(t(simulatedholdrisk)*volume_vec)
+          # simulatedhold <- simulatedholdrisk 
+            
+            melted_simulatedhold <- melt(simulatedhold)
+            colnames(melted_simulatedhold)[2] <- "Customer"
+            ggplot(melted_simulatedhold, aes(value, fill = Customer)) + geom_density(alpha = 0.2) +
+                ggtitle("Histogram of calculated holds") + xlab("Customer hold percentage") +
+                scale_x_continuous(label = percent)   
+            
+            
+            
+            
+            
+            
+        }
+        
+        
         
         
     })
