@@ -3,7 +3,7 @@ require(ggplot2)
 require(reshape)
 require(scales)
 require(shiny)
-number_of_simulations <- 50000
+number_of_simulations <- 10000
 
 
 
@@ -96,33 +96,6 @@ shinyServer(function(input, output) {
     }
     )
     
-    simulatedhold <- reactive({
-        simulatedholdrisk <- simulatedROI()
-        betprobs <- get_bet_probs()/100
-        # calculate how much bettor can max bet in pinny format
-        # where you can max bet more if line prob is over 50%
-        volume_vec <- rep(NA,length(betprobs))
-        for(i in 1:length(betprobs)) {
-            prob <- betprobs[i]
-            if(prob <= 0.5) {
-                volume_vec[i] <- 1
-            }
-            if(prob > 0.5) {
-                volume_vec[i] <- 1/(1-prob)
-            }
-            
-        }
-        
-        # multiply simulatedholdrisk vector with volume vector, so that cust1 holdrisks get multiplied
-        # by his volume vector, cust2 by her and so on
-        return(t(t(simulatedholdrisk)*volume_vec))
-        # simulatedhold <- simulatedholdrisk 
-        
-        
-        
-    })
-    
-    
     
     plotType <- reactive({
         return(input$PlotType)
@@ -134,23 +107,46 @@ shinyServer(function(input, output) {
     output$table1 <- renderTable({
         #  cust1flips()[1]
         
-        plot_type <- plotType() # 1 for game prob, 2 for ROI, 3 for winloss, 4 for hold
+        plot_type <- plotType() # 1 for game prob, 2 for ROI, 3 for winloss
         
-        if(plot_type == 1) 
-            getquantiles <- simulatedlineprob()*100
-        if(plot_type == 2) 
-            getquantiles <- simulatedROI()*100
-        if(plot_type == 3) 
-            getquantiles <- simulatedwinloss()
-        if(plot_type == 4)
-            getquantiles <- simulatedhold()*100
         
-        CI_and_mean <- apply(getquantiles, 2, function(x) quantile(x, c(0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975)))
-        CI_and_mean <- t(CI_and_mean)
+        if(plot_type == 1) {
+            
+            simulatedlineprob <- simulatedlineprob()
+            
+            
+            CI_and_mean <-        cbind("2.5%" = c(apply(simulatedlineprob, 2, function (x) quantile(x, 0.025))), "mean" = apply(simulatedlineprob, 2, mean), "97.5%" = c(apply(simulatedlineprob, 2, function (x) quantile(x, 0.975))))
+            names(CI_and_mean) <- c("2.5%", "mean", "97.5%")
+            return(CI_and_mean)
+        }
+        
+        if(plot_type == 2) {
+            
+            simulatedholdrisk <- simulatedROI()
+            
+            CI_and_mean <-  cbind("2.5%" = c(apply(simulatedholdrisk, 2, function (x) quantile(x, 0.025))), "mean" = apply(simulatedholdrisk, 2, mean), "97.5%" = c(apply(simulatedholdrisk, 2, function (x) quantile(x, 0.975))))
+            names(CI_and_mean) <- c("2.5%", "mean", "97.5%")
+            return(CI_and_mean)
+            
+            
+            
+        }
+        
+        if(plot_type == 3) {
+            
+            simulatedwinloss <- simulatedwinloss()
+            
+            
+            CI_and_mean <- cbind("2.5%" = c(apply(simulatedwinloss, 2, function (x) quantile(x, 0.025))), "mean" = apply(simulatedwinloss, 2, mean), "97.5%" = c(apply(simulatedwinloss, 2, function (x) quantile(x, 0.975))))
 
-        colnames(CI_and_mean)[ncol(CI_and_mean)/2+1] <- "mean" #assumes mean is the middle column
-
-        return(CI_and_mean)
+            names(CI_and_mean) <- c("2.5%", "mean", "97.5%")
+            return(CI_and_mean)
+            
+            
+        }
+        
+        
+        
         
         
     })
@@ -171,7 +167,7 @@ shinyServer(function(input, output) {
             melted_simulatedlineprob <- melt(simulatedlineprob)
             colnames(melted_simulatedlineprob)[2] <- "Bettor"
             return(ggplot(melted_simulatedlineprob, aes(value, fill = Bettor)) + geom_density(alpha = 0.2) +
-                       ggtitle("Histogram of maximum likehood estimates for bet win probabilities") + xlab("Win probability") +
+                       ggtitle("Histogram of maximum likehood estimates for win probabilities") + xlab("Win probability") +
                        scale_x_continuous(label = percent))
         }
         
@@ -182,7 +178,7 @@ shinyServer(function(input, output) {
             melted_simulatedholdrisk <- melt(simulatedholdrisk)
             colnames(melted_simulatedholdrisk)[2] <- "Bettor"
             return(ggplot(melted_simulatedholdrisk, aes(value, fill = Bettor)) + geom_density(alpha = 0.2) +
-                       ggtitle("Histogram of calculated ROI") + xlab("Bettor ROI percentage") +
+                       ggtitle("Histogram of calculated hold risks") + xlab("Bettor hold risk percentage") +
                        scale_x_continuous(label = percent))
         }
         
@@ -197,19 +193,37 @@ shinyServer(function(input, output) {
             melted_simulatedwinloss <- melt(simulatedwinloss)
             colnames(melted_simulatedwinloss)[2] <- "Bettor"
             return(ggplot(melted_simulatedwinloss, aes(value, fill = Bettor)) + geom_density(alpha = 0.2) +
-                ggtitle("Histogram of bettor netwin amounts") + xlab("Bettor netwin") +
+                ggtitle("Histogram of Bettor winloss amounts") + xlab("Bettor winloss") +
                 scale_x_continuous(label = dollar))
             
         }
         
         if(plot_type == 4) {
-            simulatedhold <- simulatedhold()
-            
+            simulatedholdrisk <- simulatedROI()
+            betprobs <- get_bet_probs()/100
+            # calculate how much bettor can max bet in pinny format
+            # where you can max bet more if line prob is over 50%
+            volume_vec <- rep(NA,length(betprobs))
+            for(i in 1:length(betprobs)) {
+                prob <- betprobs[i]
+                if(prob <= 0.5) {
+                    volume_vec[i] <- 1
+                }
+                if(prob > 0.5) {
+                    volume_vec[i] <- 1/(1-prob)
+                }
+                
+            }
+
+            # multiply simulatedholdrisk vector with volume vector, so that cust1 holdrisks get multiplied
+            # by his volume vector, cust2 by her and so on
+            simulatedhold <- t(t(simulatedholdrisk)*volume_vec)
+          # simulatedhold <- simulatedholdrisk 
             
             melted_simulatedhold <- melt(simulatedhold)
             colnames(melted_simulatedhold)[2] <- "Bettor"
             ggplot(melted_simulatedhold, aes(value, fill = Bettor)) + geom_density(alpha = 0.2) +
-                ggtitle("Histogram of calculated hold") + xlab("Bettor hold percentage") +
+                ggtitle("Histogram of calculated holds") + xlab("Bettor hold percentage") +
                 scale_x_continuous(label = percent)   
             
             
