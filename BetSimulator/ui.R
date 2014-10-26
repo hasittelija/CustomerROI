@@ -65,11 +65,11 @@ shinyUI(fluidPage(
             
             br(),
             br(),
-            p("For example if we choose 300 bets, 50% bet win probability and 10% ROI. It means the bettor bets 300 bets where each bet has 50% probability of winning, and on average for each unit wagered, bettor expects to make 10% profit. Since the ROI is positive, this customer is winning sports bettor and manages to find bets where the odds offered are too good. 50% bet win probability means he bets on games where the teams are evenly matched."),
+            p("For example if we choose 300 bets, 50% bet win probability and 10% ROI. It means the bettor bets 300 bets where each bet has 50% probability of winning, and on average for each unit wagered, bettor expects to make 10% profit. Since the ROI is positive, this bettor is winning sports bettor and manages to find bets where the odds offered are too good. 50% bet win probability means he bets on games where the teams are evenly matched."),
             
             br(),
             br(),
-            p("You can choose from 3 different graphs: bet win probability, customer ROI% or customer netwin (assuming each bet is for $1). Each of these 3 bettors are simulated 50000 times and the plot will show the histogram for these simulations and the table below it shows certain quantiles of the simulations.")
+            p("You can choose from 3 different graphs: bet win probability, bettor ROI% or bettor netwin (assuming each bet is for $1). Each of these 3 bettors are simulated 50000 times and the plot will show the histogram for these simulations and the table below it shows certain quantiles of the simulations.")
             
             
             
