@@ -50,7 +50,7 @@ shinyUI(fluidPage(
             
             radioButtons("PlotType", label = h3("Graph Type"),
                          choices = list("Bet win probability %" = 1, "Bettor ROI %" = 2,
-                                        "Bettor netwin" = 3, "Bettor hold %" = 4)
+                                        "Bettor netwin" = 3)
                          ,selected = 2)
             
             ,

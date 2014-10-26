@@ -96,31 +96,6 @@ shinyServer(function(input, output) {
     }
     )
     
-    simulatedhold <- reactive({
-        simulatedholdrisk <- simulatedROI()
-        betprobs <- get_bet_probs()/100
-        # calculate how much bettor can max bet in pinny format
-        # where you can max bet more if line prob is over 50%
-        volume_vec <- rep(NA,length(betprobs))
-        for(i in 1:length(betprobs)) {
-            prob <- betprobs[i]
-            if(prob <= 0.5) {
-                volume_vec[i] <- 1
-            }
-            if(prob > 0.5) {
-                volume_vec[i] <- 1/(1-prob)
-            }
-            
-        }
-        
-        # multiply simulatedholdrisk vector with volume vector, so that cust1 holdrisks get multiplied
-        # by his volume vector, cust2 by her and so on
-        return(t(t(simulatedholdrisk)*volume_vec))
-        # simulatedhold <- simulatedholdrisk 
-        
-        
-        
-    })
     
     
     
@@ -142,8 +117,6 @@ shinyServer(function(input, output) {
             getquantiles <- simulatedROI()*100
         if(plot_type == 3) 
             getquantiles <- simulatedwinloss()
-        if(plot_type == 4)
-            getquantiles <- simulatedhold()*100
         
         CI_and_mean <- apply(getquantiles, 2, function(x) quantile(x, c(0.025, 0.1, 0.25, 0.5, 0.75, 0.9, 0.975)))
         CI_and_mean <- t(CI_and_mean)
@@ -202,23 +175,7 @@ shinyServer(function(input, output) {
             
         }
         
-        if(plot_type == 4) {
-            simulatedhold <- simulatedhold()
-            
-            
-            melted_simulatedhold <- melt(simulatedhold)
-            colnames(melted_simulatedhold)[2] <- "Bettor"
-            ggplot(melted_simulatedhold, aes(value, fill = Bettor)) + geom_density(alpha = 0.2) +
-                ggtitle("Histogram of calculated hold") + xlab("Bettor hold percentage") +
-                scale_x_continuous(label = percent)   
-            
-            
-            
-            
-            
-            
-        }
-        
+      
         
         
         
